@@ -1,16 +1,8 @@
 import express, {Request, Response} from "express";
 import bodyParser from "body-parser";
-import AWS from "aws-sdk";
 import fileUpload from "express-fileupload";
-
+import {FileController} from "./src/FileController";
 require('dotenv/config')
-
-const s3 = new AWS.S3({
-    apiVersion: "2006-03-01",
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION
-});
 
 const app = express();
 app.use([
@@ -27,21 +19,19 @@ app.use([
     }
 ])
 
+
+const fileController = new FileController();
+
 app.post('/upload', async (req: Request, res: Response) => {
-    console.log(req.files?.testfile)
+    await fileController.uploadFile(req, res);
+})
 
-    s3.upload({
-            Bucket: process.env.AWS_BUCKET_NAME || "bucket",
-            Key: req.files?.testfile?.name || "noname",
-            Body: req.files?.testfile?.data
-        },
-        (error: Error, data: any) => {
-        if (error){
-            res.json({success: false, data: error})
-        }
+app.get('/files/:filename', async (req: any, res: any) => {
+    await fileController.getFile(req, res, true);
+})
 
-            res.json({success: true, data: data})
-        })
+app.get('/files/stream/:filename', async (req: any, res: any) => {
+    await fileController.getFile(req, res, false)
 })
 
 const PORT = 3000;
