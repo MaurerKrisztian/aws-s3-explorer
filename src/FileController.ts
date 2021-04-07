@@ -5,6 +5,7 @@ export class FileController {
     s3: AWS.S3 = S3Config.getS3();
 
     uploadFile(req: Request, res: Response) {
+        const dir: string = "/dir/"
         if (!req.files?.testfile) {
             res.send('file not found');
         }
@@ -12,7 +13,7 @@ export class FileController {
         this.s3.upload({
                 ACL: 'public-read',
                 Bucket: process.env.AWS_BUCKET_NAME || "bucket",
-                Key: file.name || "noname",
+                Key: dir + file.name || "noname",
                 Body: file.data
             },
             (error: Error, data: any) => {
@@ -22,6 +23,23 @@ export class FileController {
 
                 res.json({success: true, data: data})
             })
+    }
+
+    async getFileList(dir: string = '') {
+        return new Promise((resolve, reject) => {
+            const params = {
+                Bucket: process.env.AWS_BUCKET_NAME || "",
+                Delimiter: '/',
+                Prefix: dir
+            }
+
+            this.s3.listObjects(params, function (err, data) {
+                if (err) reject(err);
+                console.log(data);
+                resolve(data);
+            });
+
+        })
     }
 
 

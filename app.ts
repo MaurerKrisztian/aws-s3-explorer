@@ -30,6 +30,12 @@ app.get('/files/:filename', async (req: any, res: any) => {
     await fileController.getFile(req, res, true);
 })
 
+app.get('/dir/', async (req: any, res: any) => {
+    const result = await fileController.getFileList(req.query?.search || '');
+    console.log(result, req.query?.search)
+    res.json(result);
+})
+
 app.get('/files/stream/:filename', async (req: any, res: any) => {
     await fileController.getFile(req, res, false)
 })
