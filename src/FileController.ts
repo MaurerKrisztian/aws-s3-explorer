@@ -5,7 +5,7 @@ export class FileController {
     s3: AWS.S3 = S3Config.getS3();
 
     uploadFile(req: Request, res: Response) {
-        const dir: string = "/dir/"
+        const dir: string = req.body.path || '/'
         if (!req.files?.testfile) {
             res.send('file not found');
         }
@@ -44,7 +44,7 @@ export class FileController {
 
 
     async getFile(req: Request, res: Response, isDownload: boolean) {
-        const filename: string = req.params.filename;
+        const filename: string = req.query?.key as string;
 
         const params = {
             Bucket: process.env.AWS_BUCKET_NAME || "test",

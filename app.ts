@@ -1,11 +1,14 @@
 import express, {Request, Response} from "express";
 import bodyParser from "body-parser";
 import fileUpload from "express-fileupload";
+const cors = require("cors");
+
 import {FileController} from "./src/FileController";
 require('dotenv/config')
 
 const app = express();
 app.use([
+    cors(),
     fileUpload(),
     bodyParser.json(),
     bodyParser.urlencoded({
@@ -26,7 +29,7 @@ app.post('/upload', async (req: Request, res: Response) => {
     await fileController.uploadFile(req, res);
 })
 
-app.get('/files/:filename', async (req: any, res: any) => {
+app.get('/files/download', async (req: any, res: any) => {
     await fileController.getFile(req, res, true);
 })
 
@@ -36,7 +39,7 @@ app.get('/dir/', async (req: any, res: any) => {
     res.json(result);
 })
 
-app.get('/files/stream/:filename', async (req: any, res: any) => {
+app.get('/files/stream/', async (req: any, res: any) => {
     await fileController.getFile(req, res, false)
 })
 
